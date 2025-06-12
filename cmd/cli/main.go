@@ -21,8 +21,8 @@ func main() {
 	flag.StringVar(&cfg.method, "method", "", "REST api method")
 	flag.StringVar(&cfg.url, "url", "", "Api url to call")
 	flag.StringVar(&cfg.body, "postbody", "{}", "Post reqest body")
-	flag.IntVar(&cfg.totalCalls, "totalcalls", 0, "total calls to be made")
-	flag.IntVar(&cfg.delayMillisecond, "delay", 0, "delay between each call in ms")
+	flag.IntVar(&cfg.totalCalls, "totalcalls", 0, "Total calls to be made")
+	flag.IntVar(&cfg.delayMillisecond, "delay", 0, "Delay between each call in ms")
 
 	flag.Parse()
 
