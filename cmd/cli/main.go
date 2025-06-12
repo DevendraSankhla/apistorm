@@ -11,12 +11,16 @@ type config struct {
 	url              string
 	totalCalls       int
 	delayMillisecond int
+	method           string
+	body             string
 }
 
 func main() {
 	var cfg config
 
+	flag.StringVar(&cfg.method, "method", "", "REST api method")
 	flag.StringVar(&cfg.url, "url", "", "Api url to call")
+	flag.StringVar(&cfg.body, "postbody", "{}", "Post reqest body")
 	flag.IntVar(&cfg.totalCalls, "totalcalls", 0, "total calls to be made")
 	flag.IntVar(&cfg.delayMillisecond, "delay", 0, "delay between each call in ms")
 
@@ -26,7 +30,13 @@ func main() {
 	var wg sync.WaitGroup
 	for range cfg.totalCalls {
 		wg.Add(1)
-		go makeGetCall(cfg.url, &wg)
+		if cfg.method == "GET" {
+			go makeGetCall(cfg.url, &wg)
+		} else if cfg.method == "POST" {
+			go makePostCall(cfg.url, &wg, cfg.body)
+		} else {
+			panic("need api method")
+		}
 		time.Sleep(time.Duration(cfg.delayMillisecond) * time.Millisecond)
 	}
 	wg.Wait()
