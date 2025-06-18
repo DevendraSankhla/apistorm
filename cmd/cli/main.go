@@ -20,7 +20,7 @@ func main() {
 
 	flag.StringVar(&cfg.method, "method", "", "REST api method")
 	flag.StringVar(&cfg.url, "url", "", "Api url to call")
-	flag.StringVar(&cfg.body, "postbody", "{}", "Post reqest body")
+	flag.StringVar(&cfg.body, "body", "{}", "Post reqest body")
 	flag.IntVar(&cfg.totalCalls, "totalcalls", 0, "Total calls to be made")
 	flag.IntVar(&cfg.delayMillisecond, "delay", 0, "Delay between each call in ms")
 
@@ -30,11 +30,15 @@ func main() {
 	var wg sync.WaitGroup
 	for range cfg.totalCalls {
 		wg.Add(1)
-		if cfg.method == "GET" {
-			go makeGetCall(cfg.url, &wg)
-		} else if cfg.method == "POST" {
-			go makePostCall(cfg.url, &wg, cfg.body)
-		} else {
+		switch {
+		case cfg.method == "GET" || cfg.method == "DELETE":
+			go makeAPICall(cfg.url, cfg.method, &wg, "")
+		case cfg.method == "POST" || cfg.method == "PATCH":
+			if cfg.body == "" {
+				panic("need api body")
+			}
+			go makeAPICall(cfg.url, cfg.method, &wg, cfg.body)
+		default:
 			panic("need api method")
 		}
 		time.Sleep(time.Duration(cfg.delayMillisecond) * time.Millisecond)
